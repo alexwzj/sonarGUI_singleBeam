@@ -1614,6 +1614,12 @@ QSlider::sub-page:horizontal{
                <layout class="QHBoxLayout" name="horizontalLayout_21">
                 <item>
                  <widget class="QLabel" name="augmentLabel">
+                  <property name="minimumSize">
+                   <size>
+                    <width>72</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="maximumSize">
                    <size>
                     <width>80</width>
@@ -1749,6 +1755,12 @@ border-image: url(:/img/icon/下拉_白色.png);
                <layout class="QHBoxLayout" name="horizontalLayout_19">
                 <item>
                  <widget class="QLabel" name="label_13">
+                  <property name="minimumSize">
+                   <size>
+                    <width>72</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="maximumSize">
                    <size>
                     <width>80</width>
@@ -1866,7 +1878,7 @@ border-image: url(:/img/icon/下拉_白色.png);
                <widget class="QLabel" name="modelLabel">
                 <property name="minimumSize">
                  <size>
-                  <width>0</width>
+                  <width>72</width>
                   <height>28</height>
                  </size>
                 </property>
@@ -1982,6 +1994,12 @@ border-image: url(:/img/icon/下拉_白色.png);
                 </property>
                 <item>
                  <widget class="QLabel" name="iouLabel">
+                  <property name="minimumSize">
+                   <size>
+                    <width>72</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="maximumSize">
                    <size>
                     <width>80</width>
@@ -2116,6 +2134,12 @@ QSlider::sub-page:horizontal{
                 </property>
                 <item>
                  <widget class="QLabel" name="confLabel">
+                  <property name="minimumSize">
+                   <size>
+                    <width>72</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="maximumSize">
                    <size>
                     <width>80</width>
@@ -2253,6 +2277,12 @@ QSlider::sub-page:horizontal{
                <layout class="QHBoxLayout" name="horizontalLayout_27">
                 <item>
                  <widget class="QLabel" name="trackLabel">
+                  <property name="minimumSize">
+                   <size>
+                    <width>72</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="maximumSize">
                    <size>
                     <width>80</width>
@@ -2278,6 +2308,9 @@ color: rgb(255, 255, 255);
                 </item>
                 <item>
                  <widget class="QCheckBox" name="trackCheckBox">
+                  <property name="layoutDirection">
+                   <enum>Qt::RightToLeft</enum>
+                  </property>
                   <property name="styleSheet">
                    <string notr="true">
 QCheckBox

@@ -905,6 +905,7 @@ class Ui_mainWindow(object):
         self.horizontalLayout_21 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_21.setObjectName("horizontalLayout_21")
         self.augmentLabel = QtWidgets.QLabel(self.groupBox_8)
+        self.augmentLabel.setMinimumSize(QtCore.QSize(72, 0))
         self.augmentLabel.setMaximumSize(QtCore.QSize(80, 16777215))
         self.augmentLabel.setStyleSheet("QLabel\n"
 "{\n"
@@ -966,6 +967,7 @@ class Ui_mainWindow(object):
         self.horizontalLayout_19 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_19.setObjectName("horizontalLayout_19")
         self.label_13 = QtWidgets.QLabel(self.groupBox_8)
+        self.label_13.setMinimumSize(QtCore.QSize(72, 0))
         self.label_13.setMaximumSize(QtCore.QSize(80, 16777215))
         self.label_13.setStyleSheet("QLabel\n"
 "{\n"
@@ -1021,7 +1023,7 @@ class Ui_mainWindow(object):
         self.horizontalLayout_2.setContentsMargins(11, -1, 11, -1)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.modelLabel = QtWidgets.QLabel(self.groupBox_8)
-        self.modelLabel.setMinimumSize(QtCore.QSize(0, 28))
+        self.modelLabel.setMinimumSize(QtCore.QSize(72, 28))
         self.modelLabel.setMaximumSize(QtCore.QSize(80, 16777215))
         self.modelLabel.setStyleSheet("QLabel\n"
 "{\n"
@@ -1078,6 +1080,7 @@ class Ui_mainWindow(object):
         self.horizontalLayout_16.setSpacing(5)
         self.horizontalLayout_16.setObjectName("horizontalLayout_16")
         self.iouLabel = QtWidgets.QLabel(self.groupBox_8)
+        self.iouLabel.setMinimumSize(QtCore.QSize(72, 0))
         self.iouLabel.setMaximumSize(QtCore.QSize(80, 16777215))
         self.iouLabel.setStyleSheet("QLabel\n"
 "{\n"
@@ -1162,6 +1165,7 @@ class Ui_mainWindow(object):
         self.horizontalLayout_17.setSpacing(5)
         self.horizontalLayout_17.setObjectName("horizontalLayout_17")
         self.confLabel = QtWidgets.QLabel(self.groupBox_8)
+        self.confLabel.setMinimumSize(QtCore.QSize(72, 0))
         self.confLabel.setMaximumSize(QtCore.QSize(80, 16777215))
         self.confLabel.setStyleSheet("QLabel\n"
 "{\n"
@@ -1247,6 +1251,7 @@ class Ui_mainWindow(object):
         self.horizontalLayout_27 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_27.setObjectName("horizontalLayout_27")
         self.trackLabel = QtWidgets.QLabel(self.groupBox_8)
+        self.trackLabel.setMinimumSize(QtCore.QSize(72, 0))
         self.trackLabel.setMaximumSize(QtCore.QSize(80, 16777215))
         self.trackLabel.setStyleSheet("QLabel\n"
 "{\n"
@@ -1261,6 +1266,7 @@ class Ui_mainWindow(object):
         self.trackLabel.setObjectName("trackLabel")
         self.horizontalLayout_27.addWidget(self.trackLabel)
         self.trackCheckBox = QtWidgets.QCheckBox(self.groupBox_8)
+        self.trackCheckBox.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.trackCheckBox.setStyleSheet("\n"
 "QCheckBox\n"
 "{font-size: 16px;\n"
