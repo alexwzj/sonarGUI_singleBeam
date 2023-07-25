@@ -115,7 +115,7 @@ class Model(nn.Module):
             self.stride = m.stride
             self._initialize_biases()  # only run once
 
-        # Init weights, biases
+        # Init pt, biases
         initialize_weights(self)
         self.info()
         LOGGER.info('')
@@ -213,7 +213,7 @@ class Model(nn.Module):
     # def _print_weights(self):
     #     for m in self.model.modules():
     #         if type(m) is Bottleneck:
-    #             LOGGER.info('%10.3g' % (m.w.detach().sigmoid() * 2))  # shortcut weights
+    #             LOGGER.info('%10.3g' % (m.w.detach().sigmoid() * 2))  # shortcut pt
 
     def fuse(self):  # fuse model Conv2d() + BatchNorm2d() layers
         LOGGER.info('Fusing layers... ')

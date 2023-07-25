@@ -864,7 +864,7 @@ def autosplit(path=DATASETS_DIR / 'coco128/images', weights=(0.9, 0.1, 0.0), ann
     Usage: from YoLoV5.datasets import *; autosplit()
     Arguments
         path:            Path to images directory
-        weights:         Train, val, test weights (list, tuple)
+        pt:         Train, val, test pt (list, tuple)
         annotated_only:  Only use images with an annotated txt file
     """
     path = Path(path)  # images dir

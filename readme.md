@@ -23,7 +23,7 @@ pip install pyinstaller==5.7.0
 - package the GUI
 
 ```
-pyinstaller -D -w --add-data="./utils/*;./utils" --add-data="./config/*;./config" --add-data="./icon/*;./icon" --add-data="./pt/*;./pt" --add-data="./imgs/*;./imgs" main.py
+pyinstaller -D -w --add-data="./utils/*;./utils" --add-data="./config/*;./config" --add-data="./icon/*;./icon" --add-data="./weights/*;./weights" --add-data="./imgs/*;./imgs" main.py
 ```
 
 - if no errors occur, the packaged application is in dist/main

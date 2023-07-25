@@ -279,7 +279,7 @@ class DetectMultiBackend(nn.Module):
     # YOLOv5 MultiBackend class for python inference on various backends
     def __init__(self, weights='yolov5s.pt', device=None, dnn=False, data=None):
         # Usage:
-        #   PyTorch:              weights = *.pt
+        #   PyTorch:              pt = *.pt
         #   TorchScript:                    *.torchscript
         #   ONNX Runtime:                   *.onnx
         #   ONNX OpenCV DNN:                *.onnx with --dnn

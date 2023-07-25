@@ -53,9 +53,9 @@ class MainWindow(QMainWindow, Ui_mainWindow):
 
         # search models automatically
         self.modelComboBox.clear()
-        self.pt_list = os.listdir('./pt')
+        self.pt_list = os.listdir('weights')
         self.pt_list = [file for file in self.pt_list if file.endswith('.pt')]
-        self.pt_list.sort(key=lambda x: os.path.getsize('./pt/'+x))
+        self.pt_list.sort(key=lambda x: os.path.getsize('./weights/'+x))
         self.modelComboBox.clear()
         self.modelComboBox.addItems(self.pt_list)
         self.qtimer_search = QTimer(self)
@@ -68,7 +68,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         # yolov5 thread
         self.det_thread = YoloDetThread()
         self.model_type = self.modelComboBox.currentText()
-        self.det_thread.weights = "./pt/%s" % self.model_type
+        self.det_thread.weights = "./weights/%s" % self.model_type
         self.det_thread.source = '0'
         self.det_thread.percent_length = self.progressSlider.maximum()
         self.det_thread.send_raw.connect(lambda x: self.show_image(x, self.raw_video))
@@ -98,9 +98,9 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         self.load_setting()
 
     def search_pt(self):
-        pt_list = os.listdir('./pt')
+        pt_list = os.listdir('weights')
         pt_list = [file for file in pt_list if file.endswith('.pt')]
-        pt_list.sort(key=lambda x: os.path.getsize('./pt/' + x))
+        pt_list.sort(key=lambda x: os.path.getsize('./weights/' + x))
 
         if pt_list != self.pt_list:
             self.pt_list = pt_list
@@ -247,7 +247,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
 
     def change_model(self, x):
         self.model_type = self.modelComboBox.currentText()
-        self.det_thread.weights = "./pt/%s" % self.model_type
+        self.det_thread.weights = "./weights/%s" % self.model_type
         self.statistic_msg('模型变更为 %s' % x)
 
     def open_file(self):

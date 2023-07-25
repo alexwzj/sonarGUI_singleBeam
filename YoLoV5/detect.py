@@ -1,7 +1,7 @@
 """Run inference with a YOLOv5 model on images, videos, directories, streams
 
 Usage:
-    $ python path/to/detect.py --source path/to/img.jpg --weights yolov5s.pt --img 640
+    $ python path/to/detect.py --source path/to/img.jpg --pt yolov5s.pt --img 640
 """
 
 import argparse
@@ -25,7 +25,7 @@ from YoLoV5.torch_utils import select_device, load_classifier, time_sync
 
 # 预测不更新梯度
 @torch.no_grad()
-def run(weights='yolov5s.pt',  # model.pt path(s)   权重文件地址 默认 weights/可以是自己的路径
+def run(weights='yolov5s.pt',  # model.pt path(s)   权重文件地址 默认 pt/可以是自己的路径
         source='data/images',  # file/dir/URL/glob, 0 for webcam0   电脑自带摄像头， 默认data/images/
         imgsz=640,  # inference size (pixels)   输入图片的大小 默认640*640
         conf_thres=0.25,  # confidence threshold   输入图片的大小 默认640*640
@@ -198,7 +198,7 @@ def run(weights='yolov5s.pt',  # model.pt path(s)   权重文件地址 默认 we
 
 def parse_opt():
     """
-    weights: 训练的权重路径,可以使用自己训练的权重,也可以使用官网提供的权重
+    pt: 训练的权重路径,可以使用自己训练的权重,也可以使用官网提供的权重
     默认官网的权重yolov5s.pt(yolov5n.pt/yolov5s.pt/yolov5m.pt/yolov5l.pt/yolov5x.pt/区别在于网络的宽度和深度以此增加)
     source: 测试数据，可以是图片/视频路径，也可以是'0'(电脑自带摄像头),也可以是rtsp等视频流, 默认data/images
     data: 配置数据文件路径, 包括image/label/classes等信息, 训练自己的文件, 需要作相应更改, 可以不用管
@@ -228,7 +228,7 @@ def parse_opt():
     dnn: 用OpenCV DNN预测
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default='yolov5s.pt', help='model.pt path(s)')
+    parser.add_argument('--pt', nargs='+', type=str, default='yolov5s.pt', help='model.pt path(s)')
     parser.add_argument('--source', type=str, default='video/60.mp4', help='file/dir/URL/glob, 0 for webcam')
     parser.add_argument('--imgsz', '--img', '--img-size', type=int, default=640, help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float, default=0.25, help='confidence threshold')

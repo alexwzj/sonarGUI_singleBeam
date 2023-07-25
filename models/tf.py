@@ -4,10 +4,10 @@ TensorFlow, Keras and TFLite versions of YOLOv5
 Authored by https://github.com/zldrobit in PR https://github.com/ultralytics/yolov5/pull/1127
 
 Usage:
-    $ python models/tf.py --weights yolov5s.pt
+    $ python models/tf.py --pt yolov5s.pt
 
 Export:
-    $ python path/to/export.py --weights yolov5s.pt --include saved_model pb tflite tfjs
+    $ python path/to/export.py --pt yolov5s.pt --include saved_model pb tflite tfjs
 """
 
 import argparse
@@ -61,7 +61,7 @@ class TFPad(keras.layers.Layer):
 class TFConv(keras.layers.Layer):
     # Standard convolution
     def __init__(self, c1, c2, k=1, s=1, p=None, g=1, act=True, w=None):
-        # ch_in, ch_out, weights, kernel, stride, padding, groups
+        # ch_in, ch_out, pt, kernel, stride, padding, groups
         super().__init__()
         assert g == 1, "TF v2.2 Conv2D does not support 'groups' argument"
         assert isinstance(k, int), "Convolution with multiple kernels are not allowed."
@@ -419,7 +419,7 @@ def representative_dataset_gen(dataset, ncalib=100):
             break
 
 
-def run(weights=ROOT / 'yolov5s.pt',  # weights path
+def run(weights=ROOT / 'yolov5s.pt',  # pt path
         imgsz=(640, 640),  # inference size h,w
         batch_size=1,  # batch size
         dynamic=False,  # dynamic batch size
@@ -445,7 +445,7 @@ def run(weights=ROOT / 'yolov5s.pt',  # weights path
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', type=str, default=ROOT / 'yolov5s.pt', help='weights path')
+    parser.add_argument('--pt', type=str, default=ROOT / 'yolov5s.pt', help='pt path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[640], help='inference size h,w')
     parser.add_argument('--batch-size', type=int, default=1, help='batch size')
     parser.add_argument('--dynamic', action='store_true', help='dynamic batch size')
