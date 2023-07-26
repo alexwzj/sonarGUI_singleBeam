@@ -24,7 +24,7 @@ from ui.sonar_win import Window
 from modules.detectThread import YoloDetThread
 from modules.CustomMessageBox import MessageBox
 from modules.logger import Logger
-
+from modules.decodeThread import DecodeThread
 
 # 程序主窗口
 class MainWindow(QMainWindow, Ui_mainWindow):
@@ -62,21 +62,25 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         self.qtimer_search.timeout.connect(lambda: self.search_pt())
         self.qtimer_search.start(2000)
 
+        # 单波束探鱼仪数据解析线程
+        self.decode_thread = DecodeThread()
+        self.decode_thread.send_msg.connect(lambda x: self.statistic_msg(x))
+        self.decode_thread.send_raw.connect(lambda x: self.show_image(x, self.raw_video))
+
         # Logger
         self.log = Logger()
 
         # yolov5 thread
-        self.det_thread = YoloDetThread()
+        self.detect_thread = YoloDetThread()
         self.model_type = self.modelComboBox.currentText()
-        self.det_thread.weights = "./weights/%s" % self.model_type
-        self.det_thread.source = '0'
-        self.det_thread.percent_length = self.progressSlider.maximum()
-        self.det_thread.send_raw.connect(lambda x: self.show_image(x, self.raw_video))
-        self.det_thread.send_img.connect(lambda x: self.show_image(x, self.out_video))
-        self.det_thread.send_statistic.connect(self.show_statistic)
-        self.det_thread.send_msg.connect(lambda x: self.show_msg(x))
-        self.det_thread.send_percent.connect(lambda x: self.progressSlider.setValue(x))
-        self.det_thread.send_fps.connect(lambda x: self.fpsLabel.setText(x))
+        self.detect_thread.weights = "./weights/%s" % self.model_type
+        self.detect_thread.source = '0'
+        self.detect_thread.percent_length = self.progressSlider.maximum()
+        self.detect_thread.send_img.connect(lambda x: self.show_image(x, self.out_video))
+        self.detect_thread.send_statistic.connect(self.show_statistic)
+        self.detect_thread.send_msg.connect(lambda x: self.show_msg(x))
+        self.detect_thread.send_percent.connect(lambda x: self.progressSlider.setValue(x))
+        self.detect_thread.send_fps.connect(lambda x: self.fpsLabel.setText(x))
 
         self.fileButton.clicked.connect(self.open_file)
         self.cameraButton.clicked.connect(self.chose_cam)
@@ -131,7 +135,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             self.stop()
             MessageBox(
                 self.closeButton, title='提示', text='Loading sonar stream', time=1000, auto=True).exec_()
-            self.det_thread.source = ip
+            self.detect_thread.source = ip
             new_config = {"ip": ip}
             new_json = json.dumps(new_config, ensure_ascii=False, indent=2)
             with open('config/ip.json', 'w', encoding='utf-8') as f:
@@ -143,7 +147,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
 
     def chose_cam(self):
         try:
-            self.det_thread.jump_out = True
+            self.detect_thread.jump_out = True
             self.cameraButton.setChecked(Qt.Checked)
             MessageBox(
                 self.closeButton, title='提示', text='摄像头加载中', time=2000, auto=True).exec_()
@@ -178,7 +182,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             pos = QPoint(x, y)
             action = popMenu.exec_(pos)
             if action:
-                self.det_thread.source = action.text()
+                self.detect_thread.source = action.text()
                 self.statistic_msg('加载摄像头：{}'.format(action.text()))
         except Exception as e:
             self.statistic_msg('%s' % e)
@@ -216,12 +220,12 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             self.confSlider.setValue(int(x*100))
         elif flag == 'confSlider':
             self.confSpinBox.setValue(x/100)
-            self.det_thread.conf_thres = x/100
+            self.detect_thread.conf_thres = x/100
         elif flag == 'iouSpinBox':
             self.iouSlider.setValue(int(x*100))
         elif flag == 'iouSlider':
             self.iouSpinBox.setValue(x/100)
-            self.det_thread.iou_thres = x/100
+            self.detect_thread.iou_thres = x/100
         elif flag == 'gainSpinBox':
             self.gainSlider.setValue(x)
         elif flag == 'gainSlider':
@@ -247,7 +251,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
 
     def change_model(self, x):
         self.model_type = self.modelComboBox.currentText()
-        self.det_thread.weights = "./weights/%s" % self.model_type
+        self.detect_thread.weights = "./weights/%s" % self.model_type
         self.statistic_msg('模型变更为 %s' % x)
 
     def open_file(self):
@@ -261,7 +265,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         name, _ = QFileDialog.getOpenFileName(self, '选择文件', open_fold, "数据文件(*.txt *.mp4 *.mkv *.avi *.flv "
                                                                           "*.jpg *.png)")
         if name:
-            self.det_thread.source = name
+            self.decode_thread.source = name
             self.statistic_msg('已加载文件：{}'.format(os.path.basename(name)))
             config['open_fold'] = os.path.dirname(name)
             config_json = json.dumps(config, ensure_ascii=False, indent=2)
@@ -276,24 +280,29 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             self.showNormal()
 
     def run_or_continue(self):
-        self.det_thread.jump_out = False
+        self.decode_thread.jump_out = False
         if self.runButton.isChecked():
             self.cameraButton.setChecked(Qt.Checked)
-            self.det_thread.is_continue = True
-            if not self.det_thread.isRunning():
-                self.det_thread.start()
-            source = os.path.basename(self.det_thread.source)
+
+            self.decode_thread.is_continue = True
+            if not self.decode_thread.isRunning():
+                self.decode_thread.start()
+
+            # 先不启动detect_thread
+            # self.detect_thread.is_continue = True
+            # if not self.detect_thread.isRunning():
+            #     self.detect_thread.start()
+
+            source = os.path.basename(self.decode_thread.source)
             source = 'camera' if source.isnumeric() else source
-            self.statistic_msg('目标检测中 >> 模型：{}，数据源：{}'.
-                               format(os.path.basename(self.det_thread.weights),
-                                      source))
+            self.statistic_msg('历史文件回放中 >> 数据源：%s' % source)
         else:
-            self.det_thread.is_continue = False
+            self.decode_thread.is_continue = False
             self.statistic_msg('已暂停')
 
     def stop(self):
         self.cameraButton.setChecked(Qt.Unchecked)
-        self.det_thread.jump_out = True
+        self.decode_thread.jump_out = True
 
     def mousePressEvent(self, event):
         self.m_Position = event.pos()
@@ -348,7 +357,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             print(repr(e))
 
     def closeEvent(self, event):
-        self.det_thread.jump_out = True
+        self.decode_thread.jump_out = True
         config_file = 'config/setting.json'
         config = dict()
         config['iou'] = self.iouSpinBox.value()

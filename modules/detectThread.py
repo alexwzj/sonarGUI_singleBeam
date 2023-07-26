@@ -29,7 +29,7 @@ from YoLoV5.torch_utils import select_device
 # 目标检测线程（based on YoloV5）
 class YoloDetThread(QThread):
     send_img = pyqtSignal(np.ndarray)
-    send_raw = pyqtSignal(np.ndarray)
+    # send_raw = pyqtSignal(np.ndarray)     # detect线程只send_img，不send_raw
     send_statistic = pyqtSignal(dict)
     # emit：detecting/pause/stop/finished/error msg
     send_msg = pyqtSignal(str)
@@ -173,7 +173,7 @@ class YoloDetThread(QThread):
 
                     im0 = annotator.result()
                     self.send_img.emit(im0)
-                    self.send_raw.emit(im0s if isinstance(im0s, np.ndarray) else im0s[0])
+                    # self.send_raw.emit(im0s if isinstance(im0s, np.ndarray) else im0s[0])
                     self.send_statistic.emit(statistic_dic)
                     if self.save_fold:
                         os.makedirs(self.save_fold, exist_ok=True)
