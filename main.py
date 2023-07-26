@@ -4,12 +4,12 @@
 @Project：     sonarGUI
 @File：        main.py
 @Author：      wzj
-@Description:  程序主窗口
+@Description:  主界面线程
 @Created：     2023/7/8
 @Modified:
 """
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMenu, QAction
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMenu
 from ui.main_window import Ui_mainWindow
 from PyQt5.QtCore import Qt, QPoint, QTimer
 from PyQt5.QtGui import QImage, QPixmap
@@ -18,6 +18,7 @@ import sys
 import json
 import os
 import cv2
+import queue
 
 from YoLoV5.capnums import Camera
 from ui.sonar_win import Window
@@ -26,12 +27,14 @@ from modules.CustomMessageBox import MessageBox
 from modules.logger import Logger
 from modules.decodeThread import DecodeThread
 
+
 # 程序主窗口
 class MainWindow(QMainWindow, Ui_mainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
         self.m_flag = False
+        self.img_queue = queue.Queue()       # 用于子线程间传输图片；数据解析线程为生产者，目标检测线程为消费者
 
         # style 1: window can be stretched
         # self.setWindowFlags(Qt.CustomizeWindowHint | Qt.WindowStaysOnTopHint)
@@ -63,19 +66,19 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         self.qtimer_search.start(2000)
 
         # 单波束探鱼仪数据解析线程
-        self.decode_thread = DecodeThread()
+        self.decode_thread = DecodeThread(self.img_queue)
         self.decode_thread.send_msg.connect(lambda x: self.statistic_msg(x))
-        self.decode_thread.send_raw.connect(lambda x: self.show_image(x, self.raw_video))
 
         # Logger
         self.log = Logger()
 
         # yolov5 thread
-        self.detect_thread = YoloDetThread()
+        self.detect_thread = YoloDetThread(self.img_queue)
         self.model_type = self.modelComboBox.currentText()
         self.detect_thread.weights = "./weights/%s" % self.model_type
         self.detect_thread.source = '0'
         self.detect_thread.percent_length = self.progressSlider.maximum()
+        self.detect_thread.send_raw.connect(lambda x: self.show_image(x, self.raw_video))
         self.detect_thread.send_img.connect(lambda x: self.show_image(x, self.out_video))
         self.detect_thread.send_statistic.connect(self.show_statistic)
         self.detect_thread.send_msg.connect(lambda x: self.show_msg(x))
@@ -145,6 +148,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         except Exception as e:
             self.statistic_msg('%s' % e)
 
+    # todo：三个数据源选择按钮做互斥
     def chose_cam(self):
         try:
             self.detect_thread.jump_out = True
@@ -281,6 +285,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
 
     def run_or_continue(self):
         self.decode_thread.jump_out = False
+        self.detect_thread.jump_out = False
         if self.runButton.isChecked():
             self.cameraButton.setChecked(Qt.Checked)
 
@@ -288,10 +293,9 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             if not self.decode_thread.isRunning():
                 self.decode_thread.start()
 
-            # 先不启动detect_thread
-            # self.detect_thread.is_continue = True
-            # if not self.detect_thread.isRunning():
-            #     self.detect_thread.start()
+            self.detect_thread.is_continue = True
+            if not self.detect_thread.isRunning():
+                self.detect_thread.start()
 
             source = os.path.basename(self.decode_thread.source)
             source = 'camera' if source.isnumeric() else source

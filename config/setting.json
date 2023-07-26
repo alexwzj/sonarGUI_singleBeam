@@ -1,6 +1,6 @@
 {
-  "iou": 0.48,
-  "conf": 0.03,
-  "gain": 8,
-  "absorb": 6
+  "iou": 0.73,
+  "conf": 0.18,
+  "gain": 9,
+  "absorb": 5
 }

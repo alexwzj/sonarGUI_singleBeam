@@ -29,14 +29,14 @@ from YoLoV5.torch_utils import select_device
 # 目标检测线程（based on YoloV5）
 class YoloDetThread(QThread):
     send_img = pyqtSignal(np.ndarray)
-    # send_raw = pyqtSignal(np.ndarray)     # detect线程只send_img，不send_raw
+    send_raw = pyqtSignal(np.ndarray)
     send_statistic = pyqtSignal(dict)
     # emit：detecting/pause/stop/finished/error msg
     send_msg = pyqtSignal(str)
     send_percent = pyqtSignal(int)
     send_fps = pyqtSignal(str)
 
-    def __init__(self):
+    def __init__(self, img_queue):
         super(YoloDetThread, self).__init__()
         self.weights = './yolov5s.pt'
         self.current_weight = './yolov5s.pt'
@@ -47,6 +47,8 @@ class YoloDetThread(QThread):
         self.is_continue = True                 # continue/pause
         self.percent_length = 1000              # progress bar
         self.save_fold = None                   # './result' 为节省磁盘空间，先不连续保存，改为通过cutButton触发单次保存
+        self.img_queue = img_queue
+        self.cnt_get_from_queue = 0
 
     @torch.no_grad()
     def run(self,
@@ -113,7 +115,7 @@ class YoloDetThread(QThread):
                     if hasattr(self, 'out'):
                         self.out.release()
                     break
-                # change model
+                # 检查模型是否有变更
                 if self.current_weight != self.weights:
                     # Load model
                     model = attempt_load(self.weights, map_location=device)  # load FP32 model
@@ -129,7 +131,20 @@ class YoloDetThread(QThread):
                     if device.type != 'cpu':
                         model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
                     self.current_weight = self.weights
+
                 if self.is_continue:
+                    # 检查队列中是否有数据
+                    img_from_queue = self.img_queue.get()
+                    if img_from_queue is None:
+                        continue
+                    else:
+                        self.cnt_get_from_queue = self.cnt_get_from_queue + 1
+                        print(self.cnt_get_from_queue)
+
+                    # 将数据显示在主界面
+                    self.send_raw.emit(img_from_queue)
+                    continue    # for test：跳过以下代码
+
                     path, img, im0s, self.vid_cap = next(dataset)
                     # jump_count += 1
                     # if jump_count % 5 != 0:
@@ -173,7 +188,7 @@ class YoloDetThread(QThread):
 
                     im0 = annotator.result()
                     self.send_img.emit(im0)
-                    # self.send_raw.emit(im0s if isinstance(im0s, np.ndarray) else im0s[0])
+                    self.send_raw.emit(im0s if isinstance(im0s, np.ndarray) else im0s[0])
                     self.send_statistic.emit(statistic_dic)
                     if self.save_fold:
                         os.makedirs(self.save_fold, exist_ok=True)
