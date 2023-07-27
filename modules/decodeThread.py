@@ -61,13 +61,17 @@ class DecodeThread(QThread):
                     break
 
                 if self.is_continue:
-                    # self.sleep(5)
+                    self.msleep(10)
                     self.cnt_time = self.cnt_time + 1
-                    # rand_img = np.random.randint(255, size=(1440, 2560, 3))
-                    rand_img = cv2.imread('results/fmiri.jpg')
-                    print(type(rand_img))
-                    print(rand_img.shape)
-                    self.img_queue.put(rand_img)
+                    origin_img = cv2.imread('results/fmiri.jpg')
+
+                    mean = 0        # 设置高斯分布的均值和方差
+                    sigma = 100     # 设置高斯分布的标准差
+                    gauss = np.random.normal(mean, sigma, (768, 1024, 3))   # 根据均值和标准差生成符合高斯分布的噪声
+                    noisy_img = origin_img + gauss      # 给图片添加高斯噪声
+                    noisy_img = np.clip(noisy_img, a_min=0, a_max=255)      # 设置图片添加高斯噪声之后的像素值的范围
+                    noisy_img = noisy_img.astype(np.uint8)                  # 数据类型改为opencv支持的类型
+                    self.img_queue.put(noisy_img)
 
         except Exception as e:
             self.send_msg.emit('%s' % e)

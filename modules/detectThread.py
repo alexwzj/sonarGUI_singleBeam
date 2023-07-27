@@ -139,7 +139,7 @@ class YoloDetThread(QThread):
                         continue
                     else:
                         self.cnt_get_from_queue = self.cnt_get_from_queue + 1
-                        print(self.cnt_get_from_queue)
+                        print(time.time(), self.cnt_get_from_queue)
 
                     # 将数据显示在主界面
                     self.send_raw.emit(img_from_queue)
