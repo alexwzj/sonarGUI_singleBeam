@@ -318,6 +318,20 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             self.closeButton, title='提示', text='正在关闭', time=2000, auto=True).exec_()
         sys.exit(0)
 
+    def mousePressEvent(self, event):
+        self.m_Position = event.pos()
+        if event.button() == Qt.LeftButton:
+            if 0 < self.m_Position.x() < self.groupBox.pos().x() + self.groupBox.width() and \
+                    0 < self.m_Position.y() < self.groupBox.pos().y() + self.groupBox.height():
+                self.m_flag = True
+
+    def mouseMoveEvent(self, QMouseEvent):
+        if Qt.LeftButton and self.m_flag:
+            self.move(QMouseEvent.globalPos() - self.m_Position)
+
+    def mouseReleaseEvent(self, QMouseEvent):
+        self.m_flag = False
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
