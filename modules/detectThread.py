@@ -139,7 +139,7 @@ class YoloDetThread(QThread):
                         continue
                     else:
                         self.cnt_get_from_queue = self.cnt_get_from_queue + 1
-                        print(time.time(), self.cnt_get_from_queue)
+                        # print(time.time(), self.cnt_get_from_queue)
 
                     # 将数据显示在主界面
                     self.send_raw.emit(img_from_queue)
@@ -212,13 +212,13 @@ class YoloDetThread(QThread):
                     if percent == self.percent_length:
                         print(count)
                         self.send_percent.emit(0)
-                        self.send_msg.emit('finished')
+                        self.send_msg.emit('已完成')
                         if hasattr(self, 'out'):
                             self.out.release()
                         break
 
         except Exception as e:
-            self.send_msg.emit('%s' % e)
+            self.send_msg.emit('detect_thread.run() >> %s' % e)
 
 
 class TargetAugment():

@@ -20,7 +20,6 @@ import os
 import cv2
 import queue
 
-from YoLoV5.capnums import Camera
 from ui.sonar_win import Window
 from modules.detectThread import YoloDetThread
 from modules.CustomMessageBox import MessageBox
@@ -68,6 +67,9 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         # 单波束探鱼仪数据解析线程
         self.decode_thread = DecodeThread(self.img_queue)
         self.decode_thread.send_msg.connect(lambda x: self.statistic_msg(x))
+        self.decode_thread.percent_length = self.progressSlider.maximum()
+        self.decode_thread.send_percent.connect(lambda x: self.progressSlider.setValue(x))
+        self.progressSlider.sliderReleased.connect(self.change_percent)
 
         # Logger
         self.log = Logger()
@@ -77,16 +79,14 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         self.model_type = self.modelComboBox.currentText()
         self.detect_thread.weights = "./weights/%s" % self.model_type
         self.detect_thread.source = '0'
-        self.detect_thread.percent_length = self.progressSlider.maximum()
         self.detect_thread.send_raw.connect(lambda x: self.show_image(x, self.raw_video))
         self.detect_thread.send_img.connect(lambda x: self.show_image(x, self.out_video))
         self.detect_thread.send_statistic.connect(self.show_statistic)
         self.detect_thread.send_msg.connect(lambda x: self.show_msg(x))
-        self.detect_thread.send_percent.connect(lambda x: self.progressSlider.setValue(x))
+
         self.detect_thread.send_fps.connect(lambda x: self.fpsLabel.setText(x))
 
         self.fileButton.clicked.connect(self.open_file)
-        self.cameraButton.clicked.connect(self.chose_cam)
         self.sonarButton.clicked.connect(self.chose_sonar)
 
         self.runButton.clicked.connect(self.run_or_continue)
@@ -148,49 +148,6 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         except Exception as e:
             self.statistic_msg('%s' % e)
 
-    # todo：三个数据源选择按钮做互斥
-    def chose_cam(self):
-        try:
-            self.detect_thread.jump_out = True
-            self.cameraButton.setChecked(Qt.Checked)
-            MessageBox(
-                self.closeButton, title='提示', text='摄像头加载中', time=2000, auto=True).exec_()
-            # get the number of local cameras
-            _, cams = Camera().get_cam_num()
-            popMenu = QMenu()
-            popMenu.setFixedWidth(self.cameraButton.width())
-            popMenu.setStyleSheet('''
-                                            QMenu {
-                                            font-size: 16px;
-                                            font-family: "Microsoft YaHei UI";
-                                            font-weight: light;
-                                            color:white;
-                                            padding-left: 5px;
-                                            padding-right: 5px;
-                                            padding-top: 4px;
-                                            padding-bottom: 4px;
-                                            border-style: solid;
-                                            border-width: 0px;
-                                            border-color: rgba(255, 255, 255, 255);
-                                            border-radius: 3px;
-                                            background-color: rgba(200, 200, 200,50);}
-                                            ''')
-
-            for cam in cams:
-                exec("action_%s = QAction('%s')" % (cam, cam))
-                exec("popMenu.addAction(action_%s)" % cam)
-
-            x = self.groupBox_5.mapToGlobal(self.cameraButton.pos()).x()
-            y = self.groupBox_5.mapToGlobal(self.cameraButton.pos()).y()
-            y = y + self.cameraButton.frameGeometry().height()
-            pos = QPoint(x, y)
-            action = popMenu.exec_(pos)
-            if action:
-                self.detect_thread.source = action.text()
-                self.statistic_msg('加载摄像头：{}'.format(action.text()))
-        except Exception as e:
-            self.statistic_msg('%s' % e)
-
     def load_setting(self):
         config_file = 'config/setting.json'
         if not os.path.exists(config_file):
@@ -238,9 +195,13 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             self.absorbSlider.setValue(x)
         elif flag == 'absorbSlider':
             self.absorbSpinBox.setValue(x)
-
+        elif flag == 'progressSlider':
+            self.decode_thread.progress_slider_changed(x)
         else:
             pass
+
+    def change_percent(self):
+        self.decode_thread.progress_slider_changed(self.progressSlider.value())
 
     def statistic_msg(self, msg):
         self.statistic_label.setText(msg)
@@ -259,7 +220,6 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         self.statistic_msg('模型变更为 %s' % x)
 
     def open_file(self):
-
         config_file = 'config/fold.json'
         # config = json.load(open(config_file, 'r', encoding='utf-8'))
         config = json.load(open(config_file, 'r', encoding='utf-8'))
@@ -287,8 +247,6 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         self.decode_thread.jump_out = False
         self.detect_thread.jump_out = False
         if self.runButton.isChecked():
-            self.cameraButton.setChecked(Qt.Checked)
-
             self.decode_thread.is_continue = True
             if not self.decode_thread.isRunning():
                 self.decode_thread.start()
@@ -298,29 +256,14 @@ class MainWindow(QMainWindow, Ui_mainWindow):
                 self.detect_thread.start()
 
             source = os.path.basename(self.decode_thread.source)
-            source = 'camera' if source.isnumeric() else source
+            source = 'sonar' if source.isnumeric() else source
             self.statistic_msg('历史文件回放中 >> 数据源：%s' % source)
         else:
             self.decode_thread.is_continue = False
             self.statistic_msg('已暂停')
 
     def stop(self):
-        self.cameraButton.setChecked(Qt.Unchecked)
         self.decode_thread.jump_out = True
-
-    def mousePressEvent(self, event):
-        self.m_Position = event.pos()
-        if event.button() == Qt.LeftButton:
-            if 0 < self.m_Position.x() < self.groupBox.pos().x() + self.groupBox.width() and \
-                    0 < self.m_Position.y() < self.groupBox.pos().y() + self.groupBox.height():
-                self.m_flag = True
-
-    def mouseMoveEvent(self, QMouseEvent):
-        if Qt.LeftButton and self.m_flag:
-            self.move(QMouseEvent.globalPos() - self.m_Position)
-
-    def mouseReleaseEvent(self, QMouseEvent):
-        self.m_flag = False
 
     @staticmethod
     def show_image(img_src, label):

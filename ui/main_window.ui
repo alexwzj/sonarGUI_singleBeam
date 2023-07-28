@@ -716,6 +716,12 @@ color: rgb(255, 255, 255);
               </property>
               <item>
                <widget class="QLabel" name="sourceLabel">
+                <property name="minimumSize">
+                 <size>
+                  <width>160</width>
+                  <height>0</height>
+                 </size>
+                </property>
                 <property name="maximumSize">
                  <size>
                   <width>80</width>
@@ -928,98 +934,6 @@ background-color: rgba(48,148,243,80);}</string>
                      </property>
                      <property name="checkable">
                       <bool>true</bool>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QPushButton" name="cameraButton">
-                     <property name="minimumSize">
-                      <size>
-                       <width>55</width>
-                       <height>28</height>
-                      </size>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>28</height>
-                      </size>
-                     </property>
-                     <property name="toolTip">
-                      <string>摄像头实时数据</string>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">QPushButton{font-family: &quot;Microsoft YaHei&quot;;
-font-size: 14px;
-font-weight: bold;
-color:white;
-text-align: center center;
-padding-left: 5px;
-padding-right: 5px;
-padding-top: 4px;
-padding-bottom: 4px;
-border-style: solid;
-border-width: 0px;
-border-color: rgba(255, 255, 255, 255);
-border-radius: 3px;
-background-color: rgba(48,148,243,0);}
-
-QPushButton:focus{outline: none;}
-
-QPushButton::pressed{font-family: &quot;Microsoft YaHei&quot;;
-                     font-size: 14px;
-                     font-weight: bold;
-                     color:rgb(200,200,200);
-                     text-align: center center;
-                     padding-left: 5px;
-                     padding-right: 5px;
-                     padding-top: 4px;
-                     padding-bottom: 4px;
-                     border-style: solid;
-                     border-width: 0px;
-                     border-color: rgba(255, 255, 255, 255);
-                     border-radius: 3px;
-                     background-color:  #bf513b;}
-
-QPushButton::disabled{font-family: &quot;Microsoft YaHei&quot;;
-                     font-size: 14px;
-                     font-weight: bold;
-                     color:rgb(200,200,200);
-                     text-align: center center;
-                     padding-left: 5px;
-                     padding-right: 5px;
-                     padding-top: 4px;
-                     padding-bottom: 4px;
-                     border-style: solid;
-                     border-width: 0px;
-                     border-color: rgba(255, 255, 255, 255);
-                     border-radius: 3px;
-                     background-color:  #bf513b;}
-QPushButton::hover {
-border-style: solid;
-border-width: 0px;
-border-radius: 0px;
-background-color: rgba(48,148,243,80);}</string>
-                     </property>
-                     <property name="text">
-                      <string/>
-                     </property>
-                     <property name="icon">
-                      <iconset resource="apprcc.qrc">
-                       <normaloff>:/img/icon/摄像头关闭.png</normaloff>
-                       <normalon>:/img/icon/摄像头开启.png</normalon>
-                       <disabledoff>:/img/icon/摄像头关闭.png</disabledoff>
-                       <disabledon>:/img/icon/摄像头开启.png</disabledon>
-                       <activeoff>:/img/icon/摄像头关闭.png</activeoff>
-                       <activeon>:/img/icon/摄像头开启.png</activeon>
-                       <selectedoff>:/img/icon/摄像头关闭.png</selectedoff>
-                       <selectedon>:/img/icon/摄像头开启.png</selectedon>:/img/icon/摄像头关闭.png</iconset>
-                     </property>
-                     <property name="checkable">
-                      <bool>true</bool>
-                     </property>
-                     <property name="checked">
-                      <bool>false</bool>
                      </property>
                     </widget>
                    </item>

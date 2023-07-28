@@ -376,6 +376,7 @@ class Ui_mainWindow(object):
         self.horizontalLayout_9.setContentsMargins(11, -1, 0, -1)
         self.horizontalLayout_9.setObjectName("horizontalLayout_9")
         self.sourceLabel = QtWidgets.QLabel(self.groupBox_8)
+        self.sourceLabel.setMinimumSize(QtCore.QSize(160, 0))
         self.sourceLabel.setMaximumSize(QtCore.QSize(80, 16777215))
         self.sourceLabel.setStyleSheet("QLabel\n"
 "{\n"
@@ -525,75 +526,6 @@ class Ui_mainWindow(object):
         self.fileButton.setCheckable(True)
         self.fileButton.setObjectName("fileButton")
         self.horizontalLayout_8.addWidget(self.fileButton)
-        self.cameraButton = QtWidgets.QPushButton(self.groupBox_5)
-        self.cameraButton.setMinimumSize(QtCore.QSize(55, 28))
-        self.cameraButton.setMaximumSize(QtCore.QSize(16777215, 28))
-        self.cameraButton.setStyleSheet("QPushButton{font-family: \"Microsoft YaHei\";\n"
-"font-size: 14px;\n"
-"font-weight: bold;\n"
-"color:white;\n"
-"text-align: center center;\n"
-"padding-left: 5px;\n"
-"padding-right: 5px;\n"
-"padding-top: 4px;\n"
-"padding-bottom: 4px;\n"
-"border-style: solid;\n"
-"border-width: 0px;\n"
-"border-color: rgba(255, 255, 255, 255);\n"
-"border-radius: 3px;\n"
-"background-color: rgba(48,148,243,0);}\n"
-"\n"
-"QPushButton:focus{outline: none;}\n"
-"\n"
-"QPushButton::pressed{font-family: \"Microsoft YaHei\";\n"
-"                     font-size: 14px;\n"
-"                     font-weight: bold;\n"
-"                     color:rgb(200,200,200);\n"
-"                     text-align: center center;\n"
-"                     padding-left: 5px;\n"
-"                     padding-right: 5px;\n"
-"                     padding-top: 4px;\n"
-"                     padding-bottom: 4px;\n"
-"                     border-style: solid;\n"
-"                     border-width: 0px;\n"
-"                     border-color: rgba(255, 255, 255, 255);\n"
-"                     border-radius: 3px;\n"
-"                     background-color:  #bf513b;}\n"
-"\n"
-"QPushButton::disabled{font-family: \"Microsoft YaHei\";\n"
-"                     font-size: 14px;\n"
-"                     font-weight: bold;\n"
-"                     color:rgb(200,200,200);\n"
-"                     text-align: center center;\n"
-"                     padding-left: 5px;\n"
-"                     padding-right: 5px;\n"
-"                     padding-top: 4px;\n"
-"                     padding-bottom: 4px;\n"
-"                     border-style: solid;\n"
-"                     border-width: 0px;\n"
-"                     border-color: rgba(255, 255, 255, 255);\n"
-"                     border-radius: 3px;\n"
-"                     background-color:  #bf513b;}\n"
-"QPushButton::hover {\n"
-"border-style: solid;\n"
-"border-width: 0px;\n"
-"border-radius: 0px;\n"
-"background-color: rgba(48,148,243,80);}")
-        self.cameraButton.setText("")
-        icon10 = QtGui.QIcon()
-        icon10.addPixmap(QtGui.QPixmap(":/img/icon/摄像头关闭.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        icon10.addPixmap(QtGui.QPixmap(":/img/icon/摄像头开启.png"), QtGui.QIcon.Normal, QtGui.QIcon.On)
-        icon10.addPixmap(QtGui.QPixmap(":/img/icon/摄像头关闭.png"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
-        icon10.addPixmap(QtGui.QPixmap(":/img/icon/摄像头开启.png"), QtGui.QIcon.Disabled, QtGui.QIcon.On)
-        icon10.addPixmap(QtGui.QPixmap(":/img/icon/摄像头关闭.png"), QtGui.QIcon.Active, QtGui.QIcon.Off)
-        icon10.addPixmap(QtGui.QPixmap(":/img/icon/摄像头开启.png"), QtGui.QIcon.Active, QtGui.QIcon.On)
-        icon10.addPixmap(QtGui.QPixmap(":/img/icon/摄像头关闭.png"), QtGui.QIcon.Selected, QtGui.QIcon.Off)
-        icon10.addPixmap(QtGui.QPixmap(":/img/icon/摄像头开启.png"), QtGui.QIcon.Selected, QtGui.QIcon.On)
-        self.cameraButton.setIcon(icon10)
-        self.cameraButton.setCheckable(True)
-        self.cameraButton.setChecked(False)
-        self.cameraButton.setObjectName("cameraButton")
-        self.horizontalLayout_8.addWidget(self.cameraButton)
         self.horizontalLayout_11.addWidget(self.groupBox_5)
         self.horizontalLayout_9.addLayout(self.horizontalLayout_11)
         self.gridLayout.addLayout(self.horizontalLayout_9, 1, 0, 1, 1)
@@ -1444,7 +1376,6 @@ class Ui_mainWindow(object):
         self.sourceLabel.setText(_translate("mainWindow", "数据源"))
         self.sonarButton.setToolTip(_translate("mainWindow", "探鱼仪实时数据"))
         self.fileButton.setToolTip(_translate("mainWindow", "从文件中读取数据（raw_data、图片、视频）"))
-        self.cameraButton.setToolTip(_translate("mainWindow", "摄像头实时数据"))
         self.rangeLabel.setText(_translate("mainWindow", "量程"))
         self.rangeComboBox.setCurrentText(_translate("mainWindow", "5m"))
         self.rangeComboBox.setItemText(0, _translate("mainWindow", "5m"))
