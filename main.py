@@ -102,6 +102,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         self.absorbSpinBox.valueChanged.connect(lambda x: self.change_val(x, 'absorbSpinBox'))
         self.absorbSlider.valueChanged.connect(lambda x: self.change_val(x, 'absorbSlider'))
         self.cutButton.clicked.connect(self.saveOneImg)
+        self.speedButton.clicked.connect(self.setSpeed)
         self.load_setting()
 
     def search_pt(self):
@@ -231,6 +232,8 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         if name:
             self.decode_thread.source = name
             self.statistic_msg('已加载文件：{}'.format(os.path.basename(name)))
+            self.decode_thread.next_start_line = 0
+            self.progressSlider.setValue(0)
             config['open_fold'] = os.path.dirname(name)
             config_json = json.dumps(config, ensure_ascii=False, indent=2)
             with open(config_file, 'w', encoding='utf-8') as f:
@@ -302,6 +305,12 @@ class MainWindow(QMainWindow, Ui_mainWindow):
 
         except Exception as e:
             print(repr(e))
+
+    def setSpeed(self):
+        if self.speedButton.isChecked():
+            self.decode_thread.speed = 5
+        else:
+            self.decode_thread.speed = 1
 
     def closeEvent(self, event):
         self.decode_thread.jump_out = True

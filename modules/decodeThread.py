@@ -42,7 +42,7 @@ class DecodeThread(QThread):
         self.total_line_num_dec_percent = 0     # 总列数的1/percent_length（为加快计算速度而单独拎出来）
         self.jump_out = False
         self.is_continue = True
-        self.speed = 0                          # 控制帧速，取值：0,1
+        self.speed = 1                          # 控制帧速，1表示x轴方向每帧前进1像素，以此类推
         self.next_start_line = 0                # 下一帧图片在data_buffer中的首行行号
         self.img_queue = img_queue
         self.color_bar = {                      # index值到color的映射字典（index=data/20），注意：排序为RGB
@@ -93,6 +93,12 @@ class DecodeThread(QThread):
         self.total_line_num_dec_percent = math.floor(self.total_line_num/self.percent_length)
 
         for i in range(self.total_line_num):
+            if i == 0:
+                self.send_msg.emit('decode_thread >> 数据加载中：0%')
+            elif i % math.floor(self.total_line_num/10) == 0:
+                tmp = int(i*10 / math.floor(self.total_line_num/10))
+                self.send_msg.emit('decode_thread >> 数据加载中：' + str(tmp) + '%')
+
             line_str = lines[i]
             pkg_len = int(line_str[14:16], 16)*256 + int(line_str[12:14], 16)      # 大小端反转
             for j in range(pkg_len):
@@ -113,7 +119,7 @@ class DecodeThread(QThread):
         if self.source.lower().endswith(".txt"):
             if self.current_path != self.source:
                 self.current_path = self.source
-                self.send_msg.emit('decode_thread >> 数据加载中')
+                # self.send_msg.emit('decode_thread >> 数据加载中')
                 self.load_data_to_mem()
                 self.send_msg.emit('decode_thread >> 数据源变更为' + self.source)
 
@@ -122,14 +128,14 @@ class DecodeThread(QThread):
                 if self.jump_out:
                     if hasattr(self, 'out'):
                         self.out.release()
-                    self.send_msg.emit('decode_thread >> jump_out')
+                    self.send_msg.emit('decode_thread >> 跳出循环')
                     break
 
                 if self.is_continue:
                     self.msleep(50)
                     self.raw_img = self.data_buffer[:, self.next_start_line:self.next_start_line+1399, :]
                     if self.next_start_line < self.total_line_num - 1400:
-                        self.next_start_line += 1
+                        self.next_start_line += self.speed
                         if self.next_start_line % self.total_line_num_dec_percent == 0:
                             self.send_percent.emit(int(self.next_start_line / self.total_line_num_dec_percent))
                         # print('进度 %d ' % int(self.next_start_line / self.total_line_num_dec_percent))
