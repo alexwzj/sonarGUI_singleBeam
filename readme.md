@@ -1,3 +1,16 @@
+### Function
+
+GUI for single beam sonar (fish finder).
+
+1. support image/video/saved sonar data/udp data as input
+2. change model
+3. change IoU
+4. change confidence
+5. play speed
+6. play/pause/stop
+7. result statistics
+8. save detected image/video automatically
+
 ### TIPS
 
 This repo is based on [PyQt5-YOLOv5](https://github.com/Javacr/PyQt5-YOLOv5)
@@ -27,16 +40,5 @@ pyinstaller -D -w --add-data="./utils/*;./utils" --add-data="./config/*;./config
 ```
 
 - if no errors occur, the packaged application is in dist/main
-
-### Function
-
-1. support image/video/webcam/sonar_data as input
-2. change model
-3. change IoU
-4. change confidence
-5. set latency
-6. play/pause/stop
-7. result statistics
-8. save detected image/video automatically
 
 
