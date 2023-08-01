@@ -231,8 +231,10 @@ class MainWindow(QMainWindow, Ui_mainWindow):
                                                                           "*.jpg *.png)")
         if name:
             self.decode_thread.source = name
-            self.statistic_msg('已加载文件：{}'.format(os.path.basename(name)))
+            self.statistic_msg('已选择文件：{}'.format(os.path.basename(name)))
             self.decode_thread.next_start_line = 0
+            self.runButton.setChecked(Qt.Unchecked)
+            self.speedButton.setChecked(Qt.Unchecked)
             self.progressSlider.setValue(0)
             config['open_fold'] = os.path.dirname(name)
             config_json = json.dumps(config, ensure_ascii=False, indent=2)
@@ -260,7 +262,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
 
             source = os.path.basename(self.decode_thread.source)
             source = 'sonar' if source.isnumeric() else source
-            self.statistic_msg('历史文件回放中 >> 数据源：%s' % source)
+            self.statistic_msg('历史文件回放中：%s' % source)
         else:
             self.decode_thread.is_continue = False
             self.statistic_msg('已暂停')

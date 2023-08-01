@@ -45,7 +45,7 @@ class DecodeThread(QThread):
         self.speed = 1                          # 控制帧速，1表示x轴方向每帧前进1像素，以此类推
         self.next_start_line = 0                # 下一帧图片在data_buffer中的首行行号
         self.img_queue = img_queue
-        self.color_bar = {                      # index值到color的映射字典（index=data/20），注意：排序为RGB
+        self.color_bar = {                      # index值到color的映射字典（index=data/20），注意：排序为BGR
                                                 # Ref >> https://www.sioe.cn/yingyong/yanse-rgb-16/
             0: (112, 25, 25),       # 午夜蓝
             1: (225, 105, 65),      # 皇家蓝
@@ -104,7 +104,7 @@ class DecodeThread(QThread):
             for j in range(pkg_len):
                 data_tmp = int(line_str[18+j*4:20+j*4], 16)*256 + int(line_str[16+j*4:18+j*4], 16)
                 if data_tmp > 2000:
-                    index = int((data_tmp-2000)/2000.0*16)
+                    index = int((data_tmp-1800)/2200.0*16)
                 else:
                     index = 0
                 self.data_buffer[j, i, :] = self.color_bar[index]
@@ -119,16 +119,15 @@ class DecodeThread(QThread):
         if self.source.lower().endswith(".txt"):
             if self.current_path != self.source:
                 self.current_path = self.source
-                # self.send_msg.emit('decode_thread >> 数据加载中')
                 self.load_data_to_mem()
-                self.send_msg.emit('decode_thread >> 数据源变更为' + self.source)
+                file_name = os.path.split(os.path.splitext(self.source)[0])[-1] + os.path.splitext(self.source)[-1]    # 获取不带路径的文件名
+                self.send_msg.emit('历史文件回放中：' + file_name)
 
         try:
             while True:
                 if self.jump_out:
                     if hasattr(self, 'out'):
                         self.out.release()
-                    self.send_msg.emit('decode_thread >> 跳出循环')
                     break
 
                 if self.is_continue:
