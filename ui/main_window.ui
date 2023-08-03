@@ -1297,10 +1297,10 @@ border-image: url(:/img/icon/箭头_列表收起.png);}
                    <number>0</number>
                   </property>
                   <property name="maximum">
-                   <number>20</number>
+                   <number>100</number>
                   </property>
                   <property name="singleStep">
-                   <number>1</number>
+                   <number>10</number>
                   </property>
                   <property name="value">
                    <number>1</number>
@@ -1338,13 +1338,13 @@ QSlider::sub-page:horizontal{
                    <number>0</number>
                   </property>
                   <property name="maximum">
-                   <number>20</number>
+                   <number>100</number>
                   </property>
                   <property name="singleStep">
-                   <number>1</number>
+                   <number>10</number>
                   </property>
                   <property name="pageStep">
-                   <number>1</number>
+                   <number>10</number>
                   </property>
                   <property name="value">
                    <number>1</number>

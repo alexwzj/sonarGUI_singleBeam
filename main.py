@@ -70,6 +70,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
         self.decode_thread.percent_length = self.progressSlider.maximum()
         self.decode_thread.send_percent.connect(lambda x: self.progressSlider.setValue(x))
         self.progressSlider.sliderReleased.connect(self.change_percent)
+        self.decode_thread.send_fps.connect(lambda x: self.fpsLabel.setText(x))
 
         # Logger
         self.log = Logger()
@@ -190,8 +191,10 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             self.detect_thread.iou_thres = x/100
         elif flag == 'gainSpinBox':
             self.gainSlider.setValue(x)
+            self.decode_thread.gain = x
         elif flag == 'gainSlider':
             self.gainSpinBox.setValue(x)
+            self.decode_thread.gain = x
         elif flag == 'absorbSpinBox':
             self.absorbSlider.setValue(x)
         elif flag == 'absorbSlider':

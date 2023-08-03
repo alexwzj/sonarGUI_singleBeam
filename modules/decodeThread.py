@@ -34,14 +34,16 @@ class DecodeThread(QThread):
         super(DecodeThread, self).__init__()
         self.source = '0'
         self.screen_size = [800, 1400]          # [height, width]
+        self.pkg_len = 0                        # 包长度
         self.raw_img = np.zeros((800, 1400, 3), dtype=np.uint8)
         self.current_path = '0'                 # 已缓存的原始数据路径
-        self.data_buffer = np.zeros((800, 20000, 3), dtype=np.uint8)  # 原始数据缓存
+        self.data_tmp_buffer = np.zeros((800, 20000), dtype=np.int16)    # 原始数据缓存
         self.total_line_num = 0                 # 数据缓存中有效列数
         self.percent_length = 0                 # 进度条
         self.total_line_num_dec_percent = 0     # 总列数的1/percent_length（为加快计算速度而单独拎出来）
         self.jump_out = False
         self.is_continue = True
+        self.gain = 60                          # 数字增益
         self.speed = 1                          # 控制帧速，1表示x轴方向每帧前进1像素，以此类推
         self.next_start_line = 0                # 下一帧图片在data_buffer中的首行行号
         self.img_queue = img_queue
@@ -62,24 +64,8 @@ class DecodeThread(QThread):
             12: (0, 0, 255),        # 纯红
             13: (34, 34, 178),      # 耐火砖
             14: (0, 0, 139),        # 深红色
-            15: (0, 0, 128)         # 栗色
-
-            # 0: (90, 90, 90),
-            # 1: (100, 100, 100),
-            # 2: (110, 110, 110),
-            # 3: (120, 120, 120),
-            # 4: (130, 130, 130),
-            # 5: (140, 140, 140),
-            # 6: (150, 150, 150),
-            # 7: (160, 160, 160),
-            # 8: (170, 170, 170),
-            # 9: (180, 180, 180),
-            # 10: (190, 190, 190),
-            # 11: (200, 200, 200),
-            # 12: (210, 210, 210),
-            # 13: (220, 220, 220),
-            # 14: (230, 230, 230),
-            # 15: (240, 240, 240)
+            15: (0, 0, 128),         # 栗色
+            16: (0, 0, 50)          # max
         }
 
     # 将数据文件加载至内存
@@ -100,14 +86,12 @@ class DecodeThread(QThread):
                 self.send_msg.emit('decode_thread >> 数据加载中：' + str(tmp) + '%')
 
             line_str = lines[i]
-            pkg_len = int(line_str[14:16], 16)*256 + int(line_str[12:14], 16)      # 大小端反转
-            for j in range(pkg_len):
-                data_tmp = int(line_str[18+j*4:20+j*4], 16)*256 + int(line_str[16+j*4:18+j*4], 16)
-                if data_tmp > 2000:
-                    index = int((data_tmp-1800)/2200.0*16)
-                else:
-                    index = 0
-                self.data_buffer[j, i, :] = self.color_bar[index]
+            self.pkg_len = int(line_str[14:16], 16)*256 + int(line_str[12:14], 16)      # 大小端反转
+
+            for j in range(self.pkg_len):
+                self.data_tmp_buffer[j,i] = int(line_str[18+j*4:20+j*4], 16)*256 + int(line_str[16+j*4:18+j*4], 16)
+
+        print('max:' + str(np.max(self.data_tmp_buffer)))
 
     def progress_slider_changed(self, x):
         print('progress_slider_changed >> %d' % x)
@@ -124,6 +108,9 @@ class DecodeThread(QThread):
                 self.send_msg.emit('历史文件回放中：' + file_name)
 
         try:
+            count = 0
+            start_time = time.time()
+
             while True:
                 if self.jump_out:
                     if hasattr(self, 'out'):
@@ -131,8 +118,18 @@ class DecodeThread(QThread):
                     break
 
                 if self.is_continue:
-                    self.msleep(50)
-                    self.raw_img = self.data_buffer[:, self.next_start_line:self.next_start_line+1399, :]
+                    # self.msleep(10)
+                    denominator = np.max(self.data_tmp_buffer) * self.gain / 100  # 阈值为max的一定比例
+                    threshold = np.max(self.data_tmp_buffer) - denominator
+
+                    for i in range(self.next_start_line,self.next_start_line+1399):
+                        for j in range(self.pkg_len):
+                            if self.data_tmp_buffer[j, i] > threshold:
+                                index = int((self.data_tmp_buffer[j, i] - threshold) / denominator * 16)
+                            else:
+                                index = 0
+                            self.raw_img[j, i-self.next_start_line, :] = self.color_bar[index]
+
                     if self.next_start_line < self.total_line_num - 1400:
                         self.next_start_line += self.speed
                         if self.next_start_line % self.total_line_num_dec_percent == 0:
@@ -145,6 +142,11 @@ class DecodeThread(QThread):
 
                     self.img_queue.put(self.raw_img)
                     # print('decode_thread.run() >> 当前队列长度 %d\n' % self.img_queue.qsize())
+                    count += 1
+                    if count % 10 == 0 and count >= 10:
+                        fps = int(10 / (time.time() - start_time))
+                        self.send_fps.emit('FPS: ' + str(fps) + ' ')
+                        start_time = time.time()
 
         except Exception as e:
             self.send_msg.emit('decode_thread.run() >> %s' % e)
