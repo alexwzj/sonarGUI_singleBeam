@@ -314,9 +314,9 @@ class MainWindow(QMainWindow, Ui_mainWindow):
 
     def setSpeed(self):
         if self.speedButton.isChecked():
-            self.decode_thread.speed = 5
+            self.decode_thread.speed = 6
         else:
-            self.decode_thread.speed = 1
+            self.decode_thread.speed = 2
 
     def closeEvent(self, event):
         self.decode_thread.jump_out = True
