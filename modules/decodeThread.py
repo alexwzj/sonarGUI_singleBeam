@@ -43,6 +43,7 @@ class DecodeThread(QThread):
         self.total_line_num_dec_percent = 0     # 总列数的1/percent_length（为加快计算速度而单独拎出来）
         self.jump_out = False
         self.is_continue = True
+        self.img_idx = 0                        # img行计数
         self.gain = 60                          # 数字增益
         self.speed = 1                          # 控制帧速，1表示x轴方向每帧前进1像素，以此类推
         self.next_start_line = 0                # 下一帧图片在data_buffer中的首行行号
@@ -94,8 +95,9 @@ class DecodeThread(QThread):
         print('max:' + str(np.max(self.data_tmp_buffer)))
 
     def progress_slider_changed(self, x):
-        print('progress_slider_changed >> %d' % x)
         self.next_start_line = self.total_line_num_dec_percent * x
+        self.img_idx = self.next_start_line
+        print('progress_slider_changed: self.next_start_line: ' + str(self.next_start_line))
 
     # run函数
     def run(self):
@@ -119,32 +121,32 @@ class DecodeThread(QThread):
 
                 if self.is_continue:
                     # self.msleep(10)
-                    denominator = np.max(self.data_tmp_buffer) * self.gain / 100  # 阈值为max的一定比例
-                    threshold = np.max(self.data_tmp_buffer) - denominator
-
-                    for i in range(self.next_start_line,self.next_start_line+1399):
-                        for j in range(self.pkg_len):
-                            if self.data_tmp_buffer[j, i] > threshold:
-                                index = int((self.data_tmp_buffer[j, i] - threshold) / denominator * 16)
-                            else:
-                                index = 0
-                            self.raw_img[j, i-self.next_start_line, :] = self.color_bar[index]
-
-                    if self.next_start_line < self.total_line_num - 1400:
+                    if self.next_start_line + self.speed < self.total_line_num - 1400:
                         self.next_start_line += self.speed
                         if self.next_start_line % self.total_line_num_dec_percent == 0:
                             self.send_percent.emit(int(self.next_start_line / self.total_line_num_dec_percent))
-                        # print('进度 %d ' % int(self.next_start_line / self.total_line_num_dec_percent))
                     else:
                         self.next_start_line = 0
                         self.send_percent.emit(self.percent_length)
                         break
 
+                    denominator = np.max(self.data_tmp_buffer) * self.gain / 100  # 阈值为max的一定比例
+                    threshold = np.max(self.data_tmp_buffer) - denominator
+
+                    for self.img_idx in range(self.next_start_line,self.next_start_line+1399):
+                        # print('self.img_idx=' + str(self.img_idx) + ',  next_start_line=' + str(self.next_start_line))
+                        for j in range(self.pkg_len):
+                            if self.data_tmp_buffer[j, self.img_idx] > threshold:
+                                index = int((self.data_tmp_buffer[j, self.img_idx] - threshold) / denominator * 16)
+                            else:
+                                index = 0
+                            self.raw_img[j, self.img_idx-self.next_start_line, :] = self.color_bar[index]
+
                     self.img_queue.put(self.raw_img)
                     # print('decode_thread.run() >> 当前队列长度 %d\n' % self.img_queue.qsize())
                     count += 1
-                    if count % 10 == 0 and count >= 10:
-                        fps = int(10 / (time.time() - start_time))
+                    if count % 5 == 0 and count >= 5:
+                        fps = int(5 / (time.time() - start_time))
                         self.send_fps.emit('FPS: ' + str(fps) + ' ')
                         start_time = time.time()
 
