@@ -235,6 +235,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
             self.decode_thread.next_start_line = 0
             self.runButton.setChecked(Qt.Unchecked)
             self.speedButton.setChecked(Qt.Unchecked)
+            self.setSpeed()
             self.progressSlider.setValue(0)
             config['open_fold'] = os.path.dirname(name)
             config_json = json.dumps(config, ensure_ascii=False, indent=2)
