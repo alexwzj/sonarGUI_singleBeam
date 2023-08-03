@@ -266,7 +266,7 @@ class MainWindow(QMainWindow, Ui_mainWindow):
 
             source = os.path.basename(self.decode_thread.source)
             source = 'sonar' if source.isnumeric() else source
-            self.statistic_msg('历史文件回放中：%s' % source)
+            self.statistic_msg('main_thread >> 历史文件回放中：%s' % source)
         else:
             self.decode_thread.is_continue = False
             self.statistic_msg('已暂停')

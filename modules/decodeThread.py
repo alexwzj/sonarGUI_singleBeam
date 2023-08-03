@@ -105,7 +105,7 @@ class DecodeThread(QThread):
                 self.current_path = self.source
                 self.load_data_to_mem()
                 file_name = os.path.split(os.path.splitext(self.source)[0])[-1] + os.path.splitext(self.source)[-1]    # 获取不带路径的文件名
-                self.send_msg.emit('历史文件回放中：' + file_name)
+                self.send_msg.emit('decode_thread >> 历史文件回放中：' + file_name)
 
         try:
             count = 0
